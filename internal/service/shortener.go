@@ -1,0 +1,39 @@
+package service
+
+import (
+	"short-url/internal/shortener"
+	"short-url/internal/store"
+)
+
+// ShortenerService 定义了短链接服务的业务逻辑接口
+type ShortenerService interface {
+	Shorten(originalURL string) (string, error)
+	GetOriginalURL(shortCode string) (string, error)
+}
+
+// shortenerService 是 ShortenerService 的具体实现
+type shortenerService struct {
+	store store.Store
+}
+
+// NewShortenerService 创建一个新的 ShortenerService 实例
+func NewShortenerService(store store.Store) ShortenerService {
+	return &shortenerService{
+		store: store,
+	}
+}
+
+// Shorten 生成短链接并保存
+func (s *shortenerService) Shorten(originalURL string) (string, error) {
+	shortCode := shortener.GenerateShortCode()
+	err := s.store.Save(shortCode, originalURL)
+	if err != nil {
+		return "", err
+	}
+	return shortCode, nil
+}
+
+// GetOriginalURL 获取原始链接
+func (s *shortenerService) GetOriginalURL(shortCode string) (string, error) {
+	return s.store.Load(shortCode)
+}
