@@ -13,12 +13,15 @@
 ```
 .
 ├── cmd
-│   └── main.go           # 程序入口 (Entry Point)。负责初始化组件、配置路由和启动服务。
+│   └── short-url
+│       └── main.go           # 程序入口 (Entry Point)。负责初始化组件、配置路由和启动服务。
 ├── internal              # 内部代码包。Go 编译器强制限制，外部项目无法直接导入 internal 下的包。
 │   ├── api
 │   │   └── handler.go    # HTTP 处理器 (Handlers)。负责解析请求、调用业务逻辑和返回响应。
 │   ├── shortener
-│   │   └── shortener.go  # 核心业务逻辑。负责生成短链接代码（例如 Base62 编码）。
+│   │   └── generator.go  # 核心业务逻辑。负责生成短链接代码（例如 Base62 编码）。
+│   ├── service
+│   │   └── service.go    # 业务服务层。负责编排存储和生成逻辑。
 │   └── store
 │       ├── store.go      # 接口定义 (Interface)。定义了存储层的行为规范。
 │       └── memory.go     # 接口实现 (Implementation)。基于内存的具体存储实现。
@@ -49,9 +52,16 @@
 
 ### 前置要求 (Prerequisites)
 
-- Go 1.20 或更高版本
+- Go 1.20 或更高版本 (本地运行时需要)
+- Docker 和 Docker Compose (Docker 运行时需要)
 
 ### 运行项目 (Running the Application)
+
+你可以选择**本地内存模式**（快速开发）或**Docker 完整模式**（模拟生产）。
+
+#### 方式一：本地内存模式 (无需依赖)
+
+直接编译并运行 Go 程序，使用内存作为临时存储。重启后数据丢失。
 
 1. **下载依赖**:
    ```bash
@@ -60,29 +70,43 @@
 
 2. **启动服务**:
    ```bash
-   go run cmd/main.go
+   go run cmd/short-url/main.go
    ```
    服务将启动在 `8081` 端口。
 
-### API 使用示例 (API Usage)
+#### 方式二：Docker 完整模式 (App + Redis)
+
+构建并启动所有服务（App + Redis），数据持久化存储在 Docker Volume 中。
+
+1. **一键启动**:
+   ```bash
+   docker-compose up --build
+   ```
+   **命令参数解释**:
+   *   `up`: 读取 `docker-compose.yml` 配置，创建网络、卷，并启动所有服务容器。
+   *   `--build`: 启动前强制重新构建镜像。如果不加此参数，Docker 会尝试使用已存在的镜像，导致最新的代码修改无法生效。
+
+   **常用维护命令**:
+   *   `docker-compose down`: 停止并移除容器、网络（清理环境）。
+   *   `docker-compose logs -f`: 查看所有服务的实时日志输出。
+
+### API 验证 (Verification)
+
+服务启动后，可以使用 `curl` 命令进行验证。
 
 #### 1. 创建短链接 (Create Short URL)
 
-**接口**: `POST /shorten`
-
-**请求体**:
-```json
-{
-  "original_url": "https://www.google.com"
-}
-```
-
-**命令行测试**:
+**命令**:
 ```bash
 curl -X POST -H "Content-Type: application/json" -d '{"original_url": "https://www.google.com"}' http://localhost:8081/shorten
 ```
 
-**响应**:
+**命令解释**:
+*   `-X POST`: 指定 HTTP 请求方法为 `POST`。
+*   `-H "Content-Type: application/json"`: 设置请求头，告知服务器发送的数据格式为 JSON。
+*   `-d '{...}'`: 发送的请求体数据（JSON 格式），包含需要缩短的 `original_url`。
+
+**响应示例**:
 ```json
 {
   "original_url": "https://www.google.com",
@@ -92,16 +116,15 @@ curl -X POST -H "Content-Type: application/json" -d '{"original_url": "https://w
 
 #### 2. 访问短链接 (Access Short URL)
 
-**接口**: `GET /:shortCode`
-
-**示例**:
-在浏览器中访问上一步生成的 `short_url`，或者使用 `curl` 查看重定向头：
+**命令**:
 ```bash
-curl -I http://localhost:8081/AbCdEf
+# 请将 <short_code> 替换为上一步生成的代码 (例如 AbCdEf)
+curl -I http://localhost:8081/<short_code>
 ```
 
-**响应**:
-服务器将返回 `302 Found` 状态码，并在 `Location` 头中包含原始 URL。
+**命令解释**:
+*   `-I` (或 `--head`): 仅获取 HTTP 响应头，不下载响应体。这对于检查重定向（302 跳转）非常有用。
+*   你将在输出中看到 `HTTP/1.1 302 Found` 和 `Location: https://www.google.com`。
 
 ## 🛠 进阶练习 (Advanced Exercises)
 
