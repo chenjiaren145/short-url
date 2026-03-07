@@ -9,6 +9,7 @@ import (
 type ShortenerService interface {
 	Shorten(originalURL string) (string, error)
 	GetOriginalURL(shortCode string) (string, error)
+	GetStats(shortCode string) (int64, error)
 }
 
 // shortenerService 是 ShortenerService 的具体实现
@@ -35,5 +36,11 @@ func (s *shortenerService) Shorten(originalURL string) (string, error) {
 
 // GetOriginalURL 获取原始链接
 func (s *shortenerService) GetOriginalURL(shortCode string) (string, error) {
+	s.store.IncrementVisits(shortCode)
 	return s.store.Load(shortCode)
+}
+
+// GetStats 获取访问次数
+func (s *shortenerService) GetStats(shortCode string) (int64, error) {
+	return s.store.GetVisits(shortCode)
 }

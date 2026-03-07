@@ -58,3 +58,20 @@ func (h *Handler) Redirect(c *gin.Context) {
 
 	c.Redirect(http.StatusFound, originalURL)
 }
+
+// GetStats 获取访问次数
+func (h *Handler) GetStats(c *gin.Context) {
+	shortCode := c.Param("shortCode")
+
+	// 调用 Service 层获取访问次数
+	visits, err := h.service.GetStats(shortCode)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "获取数据失败"})
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{
+		"short_url": "http://localhost:8081/" + shortCode,
+		"visits":    visits,
+	})
+}

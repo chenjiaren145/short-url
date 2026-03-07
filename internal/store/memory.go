@@ -14,12 +14,16 @@ type MemoryStore struct {
 
 	// data 用于存储短链接到原始 URL 的映射
 	data map[string]string
+
+	// visits 用于存储短链接的访问计数
+	visits map[string]int64
 }
 
 // NewMemoryStore 创建一个新的 MemoryStore 实例
 func NewMemoryStore() *MemoryStore {
 	return &MemoryStore{
-		data: make(map[string]string),
+		data:   make(map[string]string),
+		visits: make(map[string]int64),
 	}
 }
 
@@ -46,4 +50,21 @@ func (s *MemoryStore) Load(shortCode string) (string, error) {
 		return "", ErrNotFound
 	}
 	return url, nil
+}
+
+// IncrementVisits 实现 Store 接口的 IncrementVisits 方法
+func (s *MemoryStore) IncrementVisits(shortCode string) error {
+	s.mu.Lock()
+	defer s.mu.Unlock()
+
+	s.visits[shortCode]++
+	return nil
+}
+
+// GetVisits 实现 Store 接口的 GetVisits 方法
+func (s *MemoryStore) GetVisits(shortCode string) (int64, error) {
+	s.mu.RLock()
+	defer s.mu.RUnlock()
+
+	return s.visits[shortCode], nil
 }

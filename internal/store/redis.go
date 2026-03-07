@@ -51,3 +51,26 @@ func (s *RedisStore) Load(shortCode string) (string, error) {
 	}
 	return url, nil
 }
+
+// IncrementVisits 增加访问计数
+func (s *RedisStore) IncrementVisits(shortCode string) error {
+	ctx := context.Background()
+	// 使用 INCR 命令原子递增计数器
+	// key 为 "visits:" + shortCode，避免与 URL 映射冲突
+	key := "visits:" + shortCode
+	return s.client.Incr(ctx, key).Err()
+}
+
+// GetVisits 获取访问计数
+func (s *RedisStore) GetVisits(shortCode string) (int64, error) {
+	ctx := context.Background()
+	key := "visits:" + shortCode
+	val, err := s.client.Get(ctx, key).Int64()
+	if err == redis.Nil {
+		return 0, nil
+	}
+	if err != nil {
+		return 0, err
+	}
+	return val, nil
+}

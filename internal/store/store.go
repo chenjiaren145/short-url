@@ -11,6 +11,12 @@ type Store interface {
 
 	// Load 根据短链接代码获取原始 URL
 	Load(shortCode string) (string, error)
+
+	// IncrementVisits 增加链接的访问次数
+	IncrementVisits(shortCode string) error
+
+	// GetVisits 用于获取访问记数
+	GetVisits(shortCode string) (int64, error)
 }
 
 // ErrNotFound 定义了一个统一的错误，当短链接不存在时返回
