@@ -1,5 +1,4 @@
 # Binaries
-./short-url
 *.exe
 *.exe~
 *.dll
@@ -17,3 +16,4 @@
 
 # Trae files
 .trae/
+short-url
