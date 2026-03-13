@@ -26,8 +26,11 @@ func NewShortenerService(store store.Store) ShortenerService {
 
 // Shorten 生成短链接并保存
 func (s *shortenerService) Shorten(originalURL string) (string, error) {
-	shortCode := shortener.GenerateShortCode()
-	err := s.store.Save(shortCode, originalURL)
+	shortCode, err := shortener.GenerateShortCode()
+	if err != nil {
+		return "", err
+	}
+	err = s.store.Save(shortCode, originalURL)
 	if err != nil {
 		return "", err
 	}
