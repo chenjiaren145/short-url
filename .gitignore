@@ -1,5 +1,5 @@
 # Binaries
-short-url
+./short-url
 *.exe
 *.exe~
 *.dll
@@ -14,3 +14,6 @@ short-url
 
 # Dependency directories (remove the comment below to include it)
 # vendor/
+
+# Trae files
+.trae/
