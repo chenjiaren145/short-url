@@ -12,7 +12,7 @@ import (
 
 func main() {
 	// 定义命令行参数
-	storeType := flag.String("store", "mysql", "Storage type: memory, redis or mysql")
+	storeType := flag.String("store", "memory", "Storage type: memory or redis")
 	redisAddr := flag.String("redis-addr", "localhost:6379", "Redis address")
 	redisPassword := flag.String("redis-password", "", "Redis password")
 	flag.Parse()
