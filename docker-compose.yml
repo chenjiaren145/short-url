@@ -1,13 +1,18 @@
-version: '3.8'
-
 services:
   app:
-    build: ./backend/backend
+    build: ./backend
     ports:
       - "8081:8081"
     depends_on:
-      - redis
+      redis:
+        condition: service_healthy
     command: ["./short-url", "-store", "redis", "-redis-addr", "redis:6379"]
+    healthcheck:
+      test: ["CMD", "wget", "-q", "-O", "-", "http://localhost:8081/"]
+      interval: 10s
+      timeout: 3s
+      retries: 5
+      start_period: 10s
     restart: always
 
   redis:
@@ -16,6 +21,12 @@ services:
       - "6379:6379"
     volumes:
       - redis_data:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+      start_period: 5s
     restart: always
 
 volumes:
