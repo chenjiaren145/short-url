@@ -1,8 +1,10 @@
 package api
 
 import (
+	"fmt"
 	"net/http"
 	"short-url/internal/service"
+	"strings"
 
 	"github.com/gin-gonic/gin"
 )
@@ -11,11 +13,33 @@ import (
 // 现在它依赖 service.ShortenerService，而不是直接依赖 store.Store
 type Handler struct {
 	service service.ShortenerService
+	baseURL string
 }
 
 // NewHandler 创建一个新的 Handler 实例
 func NewHandler(svc service.ShortenerService) *Handler {
 	return &Handler{service: svc}
+}
+
+func NewHandlerWithBaseURL(svc service.ShortenerService, baseURL string) *Handler {
+	return &Handler{
+		service: svc,
+		baseURL: strings.TrimRight(baseURL, "/"),
+	}
+}
+
+func (h *Handler) shortURL(c *gin.Context, shortCode string) string {
+	if h.baseURL != "" {
+		return h.baseURL + "/" + shortCode
+	}
+	scheme := "http"
+	if c.Request.TLS != nil {
+		scheme = "https"
+	}
+	if forwardedProto := c.GetHeader("X-Forwarded-Proto"); forwardedProto != "" {
+		scheme = strings.TrimSpace(strings.Split(forwardedProto, ",")[0])
+	}
+	return fmt.Sprintf("%s://%s/%s", scheme, c.Request.Host, shortCode)
 }
 
 // CreateShortURLRequest 定义了创建短链接请求的 JSON 结构
@@ -40,7 +64,7 @@ func (h *Handler) CreateShortURL(c *gin.Context) {
 	}
 
 	c.JSON(http.StatusOK, gin.H{
-		"short_url":    "http://localhost:8081/" + shortCode,
+		"short_url":    h.shortURL(c, shortCode),
 		"original_url": req.OriginalURL,
 	})
 }
@@ -71,7 +95,7 @@ func (h *Handler) GetStats(c *gin.Context) {
 	}
 
 	c.JSON(http.StatusOK, gin.H{
-		"short_url": "http://localhost:8081/" + shortCode,
+		"short_url": h.shortURL(c, shortCode),
 		"visits":    visits,
 	})
 }

@@ -1,23 +1,28 @@
-.PHONY: run-memory run-redis test build clean
+.PHONY: run run-memory run-redis test build clean compose-up compose-up-debug-redis compose-down
 
-# 默认使用内存存储启动（数据重启丢失）
+run: run-memory
+
 run-memory:
 	go -C backend run cmd/short-url/main.go -store memory
 
-# 使用 Redis 存储启动（需先启动 Docker 和 Redis）
 run-redis:
-	@echo "Ensuring Redis is running..."
-	docker-compose up -d redis
+	docker compose -f docker-compose.yml -f docker-compose.debug.yml up -d redis
 	go -C backend run cmd/short-url/main.go -store redis -redis-addr localhost:6379
 
-# 运行测试
+compose-up:
+	docker compose up --build
+
+compose-up-debug-redis:
+	docker compose -f docker-compose.yml -f docker-compose.debug.yml up --build
+
+compose-down:
+	docker compose down
+
 test:
 	go -C backend test ./...
 
-# 编译二进制文件
 build:
 	go -C backend build -o ../short-url cmd/short-url/main.go
 
-# 清理构建文件
 clean:
 	rm -f short-url
