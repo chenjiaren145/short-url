@@ -18,8 +18,8 @@ export default function URLForm({ onSubmit, loading }: URLFormProps) {
   }
 
   return (
-    <form onSubmit={handleSubmit} className="card p-6 mb-8">
-      <h2 className="section-title">创建短链接</h2>
+    <form onSubmit={handleSubmit} className="bg-white rounded-lg shadow-md p-6 mb-8">
+      <h2 className="text-xl font-semibold text-gray-800 mb-4">创建短链接</h2>
       <div className="flex gap-4">
         <input
           type="url"
@@ -28,7 +28,11 @@ export default function URLForm({ onSubmit, loading }: URLFormProps) {
           required
           className="flex-1 px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
         />
-        <button type="submit" disabled={loading} className="btn-primary">
+        <button
+          type="submit"
+          disabled={loading}
+          className="px-6 py-3 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+        >
           {loading ? '生成中...' : '生成短链接'}
         </button>
       </div>

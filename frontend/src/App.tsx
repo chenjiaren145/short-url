@@ -64,14 +64,18 @@ function App() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-100 p-8">
-      <div className="max-w-3xl mx-auto">
+    <main className="min-h-screen bg-gray-100 p-8">
+      <div className="mx-auto max-w-3xl">
         <h1 className="text-4xl font-bold text-center mb-8 text-gray-800">短链接生成器</h1>
         <URLForm onSubmit={handleCreateURL} loading={loading} />
-        {error && <div className="mt-4 p-4 bg-red-100 text-red-700 rounded-lg">{error}</div>}
+        {error && (
+          <div className="mt-4 rounded-lg border border-red-200 bg-red-100 p-4 text-red-700">
+            {error}
+          </div>
+        )}
         <URLList urls={urls} onRefreshStats={handleRefreshStats} />
       </div>
-    </div>
+    </main>
   )
 }
 
