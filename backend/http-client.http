@@ -1,0 +1,21 @@
+### 短链接服务 API 测试
+
+### 1. 创建短链接
+POST http://localhost:8081/shorten
+Content-Type: application/json
+
+{
+  "original_url": "https://example.com/very/long/url/that/needs/to/be/shortened"
+}
+
+### 2. 访问短链接（会重定向）
+GET http://localhost:8081/DwHqrL
+
+### 3. 获取访问统计
+GET http://localhost:8081/abc123/stats
+
+### 4. 健康检查
+GET http://localhost:8081/healthz
+
+### 5. 就绪检查
+GET http://localhost:8081/readyz
