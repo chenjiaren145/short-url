@@ -3,6 +3,7 @@ package service
 import (
 	"short-url/internal/shortener"
 	"short-url/internal/store"
+	"short-url/internal/validator"
 )
 
 // ShortenerService 定义了短链接服务的业务逻辑接口
@@ -26,6 +27,12 @@ func NewShortenerService(store store.Store) ShortenerService {
 
 // Shorten 生成短链接并保存
 func (s *shortenerService) Shorten(originalURL string) (string, error) {
+
+	// 检查URL是否合法
+	if err := validator.ValidateURL(originalURL); err != nil {
+		return "", err
+	}
+
 	shortCode, err := shortener.GenerateShortCode()
 	if err != nil {
 		return "", err

@@ -57,9 +57,12 @@ func (h *Handler) CreateShortURL(c *gin.Context) {
 	}
 
 	// 调用 Service 层处理业务逻辑
+	// 可以区分 400/500 code
 	shortCode, err := h.service.Shorten(req.OriginalURL)
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to create short URL"})
+
+		// 简单的做法：所有非 nil 错误都返回 400，因为验证错误是最常见的
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
 
