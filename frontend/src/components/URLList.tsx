@@ -53,12 +53,22 @@ export default function URLList({ urls, onRefreshStats }: URLListProps) {
                   <span className="text-2xl font-bold text-blue-600">{url.visits}</span>
                 </div>
               </div>
-              <button
-                onClick={() => void onRefreshStats(url.shortCode)}
-                className="px-4 py-2 bg-green-500 text-white rounded-md hover:bg-green-600 transition-colors text-sm"
-              >
-                刷新统计
-              </button>
+              <div className="flex gap-2">
+                <a
+                  href={url.shortUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="px-4 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-600 transition-colors text-sm inline-flex items-center justify-center"
+                >
+                  跳转
+                </a>
+                <button
+                  onClick={() => void onRefreshStats(url.shortCode)}
+                  className="px-4 py-2 bg-green-500 text-white rounded-md hover:bg-green-600 transition-colors text-sm"
+                >
+                  刷新统计
+                </button>
+              </div>
             </div>
           </div>
         </div>
