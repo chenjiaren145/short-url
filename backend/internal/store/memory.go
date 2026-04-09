@@ -68,3 +68,17 @@ func (s *MemoryStore) GetVisits(shortCode string) (int64, error) {
 
 	return s.visits[shortCode], nil
 }
+
+// Delete 实现 Store 接口的 Delete 方法
+func (s *MemoryStore) Delete(shortCode string) error {
+	s.mu.Lock()
+	defer s.mu.Unlock()
+
+	if _, ok := s.data[shortCode]; !ok {
+		return ErrNotFound
+	}
+
+	delete(s.data, shortCode)
+	delete(s.visits, shortCode)
+	return nil
+}

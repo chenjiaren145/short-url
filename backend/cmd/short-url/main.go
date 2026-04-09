@@ -55,6 +55,8 @@ func main() {
 
 	r.GET("/:shortCode/stats", h.GetStats)
 
+	r.DELETE("/:shortCode", h.Delete)
+
 	addr := ":" + *port
 	log.Printf("Server starting on %s", addr)
 	err := r.Run(addr)

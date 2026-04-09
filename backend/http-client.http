@@ -19,3 +19,6 @@ GET http://localhost:8081/healthz
 
 ### 5. 就绪检查
 GET http://localhost:8081/readyz
+
+### 6.删除短链接
+DELETE http://localhost:8081/DwHqrL

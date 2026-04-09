@@ -17,6 +17,9 @@ type Store interface {
 
 	// GetVisits 用于获取访问记数
 	GetVisits(shortCode string) (int64, error)
+
+	// Delete 删除短链接代码和原始 URL 的映射关系
+	Delete(shortCode string) error
 }
 
 // ErrNotFound 定义了一个统一的错误，当短链接不存在时返回

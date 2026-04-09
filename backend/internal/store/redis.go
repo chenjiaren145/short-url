@@ -74,3 +74,22 @@ func (s *RedisStore) GetVisits(shortCode string) (int64, error) {
 	}
 	return val, nil
 }
+
+// Delete 删除短链接
+func (s *RedisStore) Delete(shortCode string) error {
+	ctx := context.Background()
+
+	// Del 返回被删除的 key 数量
+	deleted, err := s.client.Del(ctx, shortCode).Result()
+	if err != nil {
+		return err
+	}
+
+	if deleted == 0 {
+		return ErrNotFound
+	}
+
+	// 删除访问计数（忽略错误可能不存在）
+	s.client.Del(ctx, "visits:"+shortCode)
+	return nil
+}

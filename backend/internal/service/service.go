@@ -1,6 +1,7 @@
 package service
 
 import (
+	"errors"
 	"short-url/internal/shortener"
 	"short-url/internal/store"
 	"short-url/internal/validator"
@@ -11,6 +12,7 @@ type ShortenerService interface {
 	Shorten(originalURL string) (string, error)
 	GetOriginalURL(shortCode string) (string, error)
 	GetStats(shortCode string) (int64, error)
+	Delete(shortCode string) error
 }
 
 // shortenerService 是 ShortenerService 的具体实现
@@ -53,4 +55,13 @@ func (s *shortenerService) GetOriginalURL(shortCode string) (string, error) {
 // GetStats 获取访问次数
 func (s *shortenerService) GetStats(shortCode string) (int64, error) {
 	return s.store.GetVisits(shortCode)
+}
+
+// Delete 删除短链接
+func (s *shortenerService) Delete(shrotCode string) error {
+	if shrotCode == "" {
+		return errors.New("请传递 shrotCode")
+	}
+
+	return s.store.Delete(shrotCode)
 }

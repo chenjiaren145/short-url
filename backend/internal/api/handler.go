@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"net/http"
 	"short-url/internal/service"
+	"short-url/internal/store"
 	"strings"
 
 	"github.com/gin-gonic/gin"
@@ -101,4 +102,23 @@ func (h *Handler) GetStats(c *gin.Context) {
 		"short_url": h.shortURL(c, shortCode),
 		"visits":    visits,
 	})
+}
+
+// Delete 删除短域名
+func (h *Handler) Delete(c *gin.Context) {
+	shortCode := c.Param("shortCode")
+
+	err := h.service.Delete(shortCode)
+	if err != nil {
+		if err == store.ErrNotFound {
+			c.JSON(http.StatusNotFound, gin.H{"error": "不存在的 shortCode"})
+			return
+		}
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "删除失败"})
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{"status": "删除成功",
+		"short_url": shortCode})
+
 }
