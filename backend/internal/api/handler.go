@@ -62,6 +62,11 @@ func (h *Handler) CreateShortURL(c *gin.Context) {
 	shortCode, err := h.service.Shorten(req.OriginalURL)
 	if err != nil {
 
+		if err == store.ErrExists {
+			c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+			return
+		}
+
 		// 简单的做法：所有非 nil 错误都返回 400，因为验证错误是最常见的
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return

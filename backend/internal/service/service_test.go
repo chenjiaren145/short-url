@@ -58,6 +58,13 @@ func (s *testStore) GetVisits(shortCode string) (int64, error) {
 	return s.visits[shortCode], nil
 }
 
+func (s *testStore) Delete(shortCode string) error {
+	delete(s.data, shortCode)
+	delete(s.visits, shortCode)
+	delete(s.incrementCalls, shortCode)
+	return nil
+}
+
 func TestShorten(t *testing.T) {
 	st := newTestStore()
 	svc := NewShortenerService(st)
