@@ -25,3 +25,5 @@ type Store interface {
 // ErrNotFound 定义了一个统一的错误，当短链接不存在时返回
 // 这样上层调用者不需要关心具体的存储实现返回什么错误，只需要判断是否是这个错误即可。
 var ErrNotFound = errors.New("short code not found")
+
+var ErrExists = errors.New("short code already exists")

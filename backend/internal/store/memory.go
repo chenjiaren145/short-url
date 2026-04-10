@@ -34,6 +34,11 @@ func (s *MemoryStore) Save(shortCode string, originalURL string) error {
 	// 使用 defer 确保函数退出时自动释放锁，避免死锁
 	defer s.mu.Unlock()
 
+	_, ok := s.data[shortCode]
+	if ok {
+		return ErrExists
+	}
+
 	s.data[shortCode] = originalURL
 	return nil
 }

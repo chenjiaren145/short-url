@@ -31,10 +31,13 @@ func NewRedisStore(addr string, password string, db int) *RedisStore {
 // Save 实现 Store 接口的 Save 方法
 func (s *RedisStore) Save(shortCode string, originalURL string) error {
 	ctx := context.Background()
-	// 使用 SET 命令保存键值对
-	// 0 表示不过期（永久保存）。
-	// 如果需要设置过期时间（例如 7 天），可以把 0 改为 7 * 24 * time.Hour
-	err := s.client.Set(ctx, shortCode, originalURL, 0).Err()
+
+	// 使用 Set + NX 选项原子性地保存
+	// NX: 仅在 key 不存在时设置，避免竞态条件
+	err := s.client.SetNX(ctx, shortCode, originalURL, 0).Err()
+	if err == redis.Nil {
+		return ErrExists
+	}
 	return err
 }
 
